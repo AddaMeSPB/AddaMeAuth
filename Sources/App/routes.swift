@@ -9,10 +9,11 @@ func routes(_ app: Application) throws {
         return "Hello, world!"
     }
 
+    try app.routes.register(collection: AuthController())
+    
     try app.group("v1") { api in
         let users = app.grouped("users")
         let usersAuth = users.grouped(JWTMiddleware())
-        try app.routes.register(collection: AuthController())
         try usersAuth.register(collection: UserController() )
     }
 }

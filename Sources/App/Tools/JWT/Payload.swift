@@ -19,7 +19,7 @@ struct Payload: JWTPayload {
     let lastname: String?
     let phoneNumber: String
     let userId: ObjectId
-    let status: Int = 0
+    var status: Int = 0
     let exp: Int
     let iat: Int
 

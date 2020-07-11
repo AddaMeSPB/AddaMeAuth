@@ -17,36 +17,59 @@ public func configure(_ app: Application) throws {
 
     switch app.environment {
     case .production:
-        app.apns.configuration = try .init(
-            authenticationMethod: .jwt(
-                key: .private(filePath: "home/ubuntu/AuthKey_\(KEY_IDENTIFIER).p8"),
-                keyIdentifier: keyIdentifier,
-                teamIdentifier: TEAM_IDENTIFIER
+        app.apns.configuration = try .init( authenticationMethod: .jwt(
+            key: .private(pem: Data(Environment.apnsKey.utf8)),
+            keyIdentifier: .init(string: Environment.apnsKeyId),
+            teamIdentifier: Environment.apnsTeamId
             ),
-            topic: "com.tenreck.app",
+            topic: Environment.apnsTopic,
             environment: .production
         )
     case .development:
-        app.apns.configuration = try .init(
-            authenticationMethod: .jwt(
-                key: .private(filePath: "./AuthKey_\(KEY_IDENTIFIER).p8"),
-                keyIdentifier: keyIdentifier,
-                teamIdentifier: TEAM_IDENTIFIER
+        app.apns.configuration = try .init( authenticationMethod: .jwt(
+            key: .private(pem: Data(Environment.apnsKey.utf8)),
+            keyIdentifier: .init(string: Environment.apnsKeyId),
+            teamIdentifier: Environment.apnsTeamId
             ),
-            topic: "com.tenreck.app2",
+            topic: Environment.apnsTopic,
             environment: .sandbox
         )
     default:
-        app.apns.configuration = try .init(
-            authenticationMethod: .jwt(
-                key: .private(filePath: "./AuthKey_\(KEY_IDENTIFIER).p8"),
-                keyIdentifier: keyIdentifier,
-                teamIdentifier: TEAM_IDENTIFIER
+        app.apns.configuration = try .init( authenticationMethod: .jwt(
+            key: .private(pem: Data(Environment.apnsKey.utf8)),
+            keyIdentifier: .init(string: Environment.apnsKeyId),
+            teamIdentifier: Environment.apnsTeamId
             ),
-            topic: "com.tenreck.app2",
+            topic: Environment.apnsTopic,
             environment: .sandbox
         )
     }
+
+    var connectionString: String
+    switch app.environment {
+    case .production:
+        guard let mongoURL = Environment.get("MONGO_DB_PRO") else {
+            fatalError("No MongoDB connection string is available in .env_production")
+        }
+        connectionString = mongoURL
+    case .development:
+        guard let mongoURL = Environment.get("MONGO_DB_DEV") else {
+            fatalError("No MongoDB connection string is available in .env_development")
+        }
+        connectionString = mongoURL
+        print("mongoURL: \(connectionString)")
+    default:
+        guard let mongoURL = Environment.get("MONGO_DB_DEV") else {
+            fatalError("No MongoDB connection string is available in .env_development")
+        }
+        connectionString = mongoURL
+        print("mongoURL: \(connectionString)")
+    }
+
+    try app.initializeMongoDB(connectionString: connectionString)
+    try app.databases.use(.mongo(
+        connectionString: connectionString
+    ), as: .mongo)
 
     guard let jwksString = Environment.process.JWKS else {
         fatalError("No value was found at the given public key environment 'JWKS'")
