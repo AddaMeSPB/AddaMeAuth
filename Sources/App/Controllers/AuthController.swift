@@ -43,7 +43,17 @@ final class AuthController {
             phoneNumber: phoneNumber
         )
 
-        #if os(Linux)
+        switch req.application.environment {
+        case .production:
+            return req.mongoDB[SMSVerification.schema].insertEncoded(smsAttempt).map{_ in smsAttempt}
+                .flatMapThrowing { attempt in
+                    let attemptId = attempt.id
+                    return SendUserVerificationResponse(
+                        phoneNumber: phoneNumber, attemptId: attemptId
+                    )
+                }.hop(to: req.eventLoop)
+
+        case .development:
             return req.application.twilio.send(sms).flatMap { success -> EventLoopFuture<SMSVerification> in
 
                 guard success.status != .badRequest else {
@@ -52,12 +62,14 @@ final class AuthController {
 
                 let smsAttempt = SMSVerification(
                     id: ObjectId(),
-                    code: code,
+                    code: "\(code)",
                     expiresAt: Date().addingTimeInterval(5.0 * 60.0),
                     phoneNumber: phoneNumber
                 )
 
-                return req.mongodb[SMSVerification.schema].insertEncoded(smsAttempt).map{_ in smsAttempt}
+                print("code: \(code)")
+                
+                return req.mongoDB[SMSVerification.schema].insertEncoded(smsAttempt).map{_ in smsAttempt}
             }
             .flatMapThrowing { attempt in
                 let attemptId = attempt.id
@@ -65,15 +77,30 @@ final class AuthController {
                     phoneNumber: phoneNumber, attemptId: attemptId
                 )
             }.hop(to: req.eventLoop)
-        #else
-            return req.mongodb[SMSVerification.schema].insertEncoded(smsAttempt).map{_ in smsAttempt}
+
+
+        default:
+            return req.application.twilio.send(sms).flatMap { success -> EventLoopFuture<SMSVerification> in
+
+                guard success.status != .badRequest else {
+                    return req.eventLoop.makeFailedFuture(Abort(success.status))
+                }
+
+                let smsAttempt = SMSVerification(
+                    id: ObjectId(),
+                    code: "\(code)",
+                    expiresAt: Date().addingTimeInterval(5.0 * 60.0),
+                    phoneNumber: phoneNumber
+                )
+
+                return req.mongoDB[SMSVerification.schema].insertEncoded(smsAttempt).map{_ in smsAttempt}
+            }
             .flatMapThrowing { attempt in
                 let attemptId = attempt.id
                 return SendUserVerificationResponse(
                     phoneNumber: phoneNumber, attemptId: attemptId
                 )
-            }.hop(to: req.eventLoop)
-        #endif
+            }.hop(to: req.eventLoop)        }
     }
 
     private func validateVerificationCode(_ req: Request) throws -> EventLoopFuture<LoginResponse> {
@@ -83,7 +110,7 @@ final class AuthController {
         let phoneNumber = data.phoneNumber.removingInvalidCharacters
 
         // TODO Verify implementation of .unwrap(or: Abort(.notFound) ) works
-        return req.mongodb[SMSVerification.schema].findOne(["code": code, "phone_number": phoneNumber])
+        return req.mongoDB[SMSVerification.schema].findOne(["code": code, "phone_number": phoneNumber])
             .flatMapThrowing({ (document : Document?) -> SMSVerification in
                 if (document != nil) {
                     return try! BSONDecoder().decode(SMSVerification.self, from: document!)
@@ -104,12 +131,12 @@ final class AuthController {
                 }
 
                 return  self.verificationResponseForValidUser(with: smsVerification, on: req)
-        }
+            }
     }
 
     private func verificationResponseForValidUser(with smsVerification: SMSVerification, on req: Request) -> EventLoopFuture<LoginResponse> {
 
-        return req.mongodb[User.schema].findOne(["phone_number": smsVerification.phoneNumber])
+        return req.mongoDB[User.schema].findOne(["phone_number": smsVerification.phoneNumber])
             .map { (document : Document?) -> User? in
                 if (document != nil) {
                     return try! BSONDecoder().decode(User.self, from: document!)
@@ -122,10 +149,10 @@ final class AuthController {
                     return req.eventLoop.future(user!)
                 } else {
                     let newUser = User(phoneNumber: smsVerification.phoneNumber, fastName: nil, lastName: nil, email: nil, contactIds: nil, deviceIds: nil)
-                    return req.mongodb[User.schema]
+                    return req.mongoDB[User.schema]
                         .insertEncoded(newUser)
                         .flatMap { (insertReply: InsertReply) -> EventLoopFuture<User?> in
-                            return req.mongodb[User.schema].findOne(["_id": newUser.id], as: User.self)
+                            return req.mongoDB[User.schema].findOne(["_id": newUser.id], as: User.self)
                         }
                         .flatMap { (v: User?) -> EventLoopFuture<User> in
                             return req.eventLoop.future(v!)
@@ -140,14 +167,14 @@ final class AuthController {
                     let refreshPayload = RefreshToken(user: user)
                     let refreshToken = try req.application.jwt.signers.sign(refreshPayload)
                     let userResponse = UserResponse(id: user.id, firstName: user.firstName, lastName: user.lastName, phoneNumber: user.phoneNumber)
-                    _ = smsVerification.delete(on: req.mongodb)
+                    _ = smsVerification.delete(on: req.mongoDB)
                     let access = RefreshResponse(accessToken: accessToken, refreshToken: refreshToken)
                     return req.eventLoop.future(user).transform(
                         to: LoginResponse.init(access: access, user: userResponse)
                     )
                 }
                 catch {
-                    return req.eventLoop.makeFailedFuture(Abort(.internalServerError))
+                    return req.eventLoop.makeFailedFuture(error)
                 }
             }
     }
@@ -162,7 +189,7 @@ final class AuthController {
 
         let userId = jwtPayload.id
 
-        return req.mongodb[User.schema].findOne("_id" == userId)
+        return req.mongoDB[User.schema].findOne("_id" == userId)
             .flatMapThrowing({ (document : Document?) -> User in
                 if (document != nil) {
                     return try! BSONDecoder().decode(User.self, from: document!)

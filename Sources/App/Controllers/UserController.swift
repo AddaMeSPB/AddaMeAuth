@@ -11,16 +11,16 @@ import MongoKitten
 final class UserController: RouteCollection {
 
     func boot(routes: RoutesBuilder) throws {
-        routes.get(":users_id", use: show)
+        routes.get(":users_id", use: find)
         routes.put(":users_id", use: update)
     }
 
-    private func show(_ req: Request) throws -> EventLoopFuture<User> {
+    private func find(_ req: Request) throws -> EventLoopFuture<User> {
         guard let _id = req.parameters.get("\(User.schema)_id"), let id = ObjectId(_id) else {
             return req.eventLoop.makeFailedFuture(Abort(.notFound))
         }
 
-        return req.mongodb[User.schema].findOne("_id" == id, as: User.self)
+        return req.mongoDB[User.schema].findOne("_id" == id, as: User.self)
             .unwrap(or: Abort(.notFound))
     }
 
@@ -35,7 +35,7 @@ final class UserController: RouteCollection {
         let encoded: Document = try encoder.encode(data)
         let updator: Document = ["$set": encoded]
 
-        return req.mongodb[User.schema].updateOne(where: "_id" == id, to: updator).map { _ in
+        return req.mongoDB[User.schema].updateOne(where: "_id" == id, to: updator).map { _ in
             return User(data)
         }
     }

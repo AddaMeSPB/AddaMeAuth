@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  String+Base64.swift
 //  
 //
 //  Created by Alif on 11/7/20.

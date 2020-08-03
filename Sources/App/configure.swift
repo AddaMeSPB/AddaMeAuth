@@ -3,47 +3,43 @@ import MongoKitten
 import Twilio
 import APNS
 import JWTKit
+import Fluent
+import FluentMongoDriver
 
 // configures your application
 public func configure(_ app: Application) throws {
     // uncomment to serve files from /Public folder
 
-    guard
-        let KEY_IDENTIFIER = Environment.get("KEY_IDENTIFIER"),
-        let TEAM_IDENTIFIER = Environment.get("TEAM_IDENTIFIER") else {
-        fatalError("No value was found at the given public key environment 'APNSAuthKey'")
-    }
-    let keyIdentifier = JWKIdentifier.init(string: KEY_IDENTIFIER)
-
-    switch app.environment {
-    case .production:
-        app.apns.configuration = try .init( authenticationMethod: .jwt(
-            key: .private(pem: Data(Environment.apnsKey.utf8)),
-            keyIdentifier: .init(string: Environment.apnsKeyId),
-            teamIdentifier: Environment.apnsTeamId
-            ),
-            topic: Environment.apnsTopic,
-            environment: .production
-        )
-    case .development:
-        app.apns.configuration = try .init( authenticationMethod: .jwt(
-            key: .private(pem: Data(Environment.apnsKey.utf8)),
-            keyIdentifier: .init(string: Environment.apnsKeyId),
-            teamIdentifier: Environment.apnsTeamId
-            ),
-            topic: Environment.apnsTopic,
-            environment: .sandbox
-        )
-    default:
-        app.apns.configuration = try .init( authenticationMethod: .jwt(
-            key: .private(pem: Data(Environment.apnsKey.utf8)),
-            keyIdentifier: .init(string: Environment.apnsKeyId),
-            teamIdentifier: Environment.apnsTeamId
-            ),
-            topic: Environment.apnsTopic,
-            environment: .sandbox
-        )
-    }
+//    switch app.environment {
+//    case .production:
+//        app.apns.configuration = try .init( authenticationMethod: .jwt(
+//            key: .private(pem: Data(Environment.apnsKey.utf8)),
+//            keyIdentifier: .init(string: Environment.apnsKeyId),
+//            teamIdentifier: Environment.apnsTeamId
+//            ),
+//            topic: Environment.apnsTopic,
+//            environment: .production
+//        )
+//    case .development:
+//        app.apns.configuration = try .init(
+//            authenticationMethod: .jwt(
+//                key: .private(pem: Data(Environment.apnsKey.utf8)),
+//                keyIdentifier: .init(string: Environment.apnsKeyId),
+//                teamIdentifier: Environment.apnsTeamId
+//            ),
+//            topic: Environment.apnsTopic,
+//            environment: .sandbox
+//        )
+//    default:
+//        app.apns.configuration = try .init( authenticationMethod: .jwt(
+//            key: .private(pem: Data(Environment.apnsKey.utf8)),
+//            keyIdentifier: .init(string: Environment.apnsKeyId),
+//            teamIdentifier: Environment.apnsTeamId
+//            ),
+//            topic: Environment.apnsTopic,
+//            environment: .sandbox
+//        )
+//    }
 
     var connectionString: String
     switch app.environment {
@@ -90,13 +86,13 @@ public func configure(_ app: Application) throws {
     case .production:
         app.http.server.configuration.hostname = "https://addame.com"
     case .development:
-        app.http.server.configuration.port = 8080
+        app.http.server.configuration.port = 1010
         app.http.server.configuration.hostname = "0.0.0.0"
     default:
-        app.http.server.configuration.port = 8080
+        app.http.server.configuration.port = 1010
         app.http.server.configuration.hostname = "0.0.0.0"
     }
 
     try routes(app)
-
+    try boot(app)
 }
