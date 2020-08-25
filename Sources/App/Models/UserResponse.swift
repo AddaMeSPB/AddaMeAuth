@@ -35,9 +35,9 @@ struct RefreshResponse: Content {
 
 final class LoginResponse: Content {
     var access: RefreshResponse
-    let user: UserResponse
+    let user: User.Res
 
-    init(access: RefreshResponse, user: UserResponse) {
+    init(access: RefreshResponse, user: User.Res) {
         self.access = access
         self.user = user
     }

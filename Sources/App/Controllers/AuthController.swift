@@ -148,7 +148,8 @@ final class AuthController {
                 if user != nil {
                     return req.eventLoop.future(user!)
                 } else {
-                    let newUser = User(phoneNumber: smsVerification.phoneNumber, fastName: nil, lastName: nil, email: nil, contactIds: nil, deviceIds: nil)
+                    let createAndUpdate = Date()
+                    let newUser = User(firstName: user?.firstName, lastName: user?.lastName, phoneNumber: smsVerification.phoneNumber, email: user?.email, contactIds: user?.contactIds, deviceIds: user?.deviceIds, createdAt: createAndUpdate, updatedAt: createAndUpdate, deletedAt: nil)
                     return req.mongoDB[User.schema]
                         .insertEncoded(newUser)
                         .flatMap { (insertReply: InsertReply) -> EventLoopFuture<User?> in
@@ -166,7 +167,7 @@ final class AuthController {
                     let accessToken = try req.application.jwt.signers.sign(userPayload)
                     let refreshPayload = RefreshToken(user: user)
                     let refreshToken = try req.application.jwt.signers.sign(refreshPayload)
-                    let userResponse = UserResponse(id: user.id, firstName: user.firstName, lastName: user.lastName, phoneNumber: user.phoneNumber)
+                    let userResponse = user.response
                     _ = smsVerification.delete(on: req.mongoDB)
                     let access = RefreshResponse(accessToken: accessToken, refreshToken: refreshToken)
                     return req.eventLoop.future(user).transform(
