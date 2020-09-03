@@ -31,6 +31,11 @@ protocol AccessTokenStorage: class {
 struct RefreshResponse: Content {
     var accessToken: String
     var refreshToken: String
+    
+    enum CodingKeys: String, CodingKey {
+        case accessToken = "access_token"
+        case refreshToken = "refresh_token"
+    }
 }
 
 final class LoginResponse: Content {
