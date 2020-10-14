@@ -6,13 +6,10 @@
 //
 
 import Vapor
+import MongoKitten
 
 struct VerifySMSInput: Content {
     let phoneNumber: String
     let code: String
-
-    enum CodingKeys: String, CodingKey {
-        case code
-        case phoneNumber = "phone_number"
-    }
+    let attemptId: ObjectId
 }

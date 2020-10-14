@@ -7,6 +7,7 @@
 
 import Vapor
 import MongoKitten
+import AddaAPIGatewayModels
 
 struct UserSuccessResponse: Content {
     let user: UserResponse
@@ -31,20 +32,11 @@ protocol AccessTokenStorage: class {
 struct RefreshResponse: Content {
     var accessToken: String
     var refreshToken: String
-    
-    enum CodingKeys: String, CodingKey {
-        case accessToken = "access_token"
-        case refreshToken = "refresh_token"
-    }
 }
 
-final class LoginResponse: Content {
-    var access: RefreshResponse
-    let user: User.Res
-
-    init(access: RefreshResponse, user: User.Res) {
-        self.access = access
-        self.user = user
-    }
+struct LoginResponse: Content {
+    let user: User?
+    let status: String
+    let access: RefreshResponse?
 }
 

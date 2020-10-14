@@ -7,6 +7,7 @@
 
 import Vapor
 import MongoKitten
+import AddaAPIGatewayModels
 
 final class UserController: RouteCollection {
 
@@ -29,14 +30,14 @@ final class UserController: RouteCollection {
             return req.eventLoop.makeFailedFuture(Abort(.notFound))
         }
 
-        let data = try req.content.decode(User.Req.self)
+        let data = try req.content.decode(User.self)
 
         let encoder = BSONEncoder()
         let encoded: Document = try encoder.encode(data)
         let updator: Document = ["$set": encoded]
 
         return req.mongoDB[User.schema].updateOne(where: "_id" == id, to: updator).map { _ in
-            return User(data)
+            return data
         }
     }
 

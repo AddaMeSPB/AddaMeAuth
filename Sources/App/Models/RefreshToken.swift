@@ -8,9 +8,10 @@
 import Vapor
 import JWT
 import MongoKitten
+import AddaAPIGatewayModels
 
 struct RefreshToken: JWTPayload {
-    var id: ObjectId
+    var id: ObjectId?
     var iat: Int
     var exp: Int
 

@@ -86,10 +86,10 @@ public func configure(_ app: Application) throws {
     case .production:
         app.http.server.configuration.hostname = "https://addame.com"
     case .development:
-        app.http.server.configuration.port = 1010
+        app.http.server.configuration.port = 3030
         app.http.server.configuration.hostname = "0.0.0.0"
     default:
-        app.http.server.configuration.port = 1010
+        app.http.server.configuration.port = 3030
         app.http.server.configuration.hostname = "0.0.0.0"
     }
 
