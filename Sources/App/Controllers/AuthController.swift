@@ -190,7 +190,7 @@ final class AuthController {
             .filter(\.$id == userID)
             .first()
             .unwrap(or: Abort(.notFound, reason: "User not found by id: \(userID) for refresh token"))
-            .map { (user : User) -> RefreshTokenResponse in
+            .flatMap { (user: User) -> EventLoopFuture<RefreshTokenResponse> in
                 let payload = Payload(id: user.id!, phoneNumber: user.phoneNumber)
                 var payloadString = ""
                 
@@ -200,11 +200,14 @@ final class AuthController {
                 do {
                     refreshToken = try req.application.jwt.signers.sign(refreshPayload)
                     payloadString = try req.application.jwt.signers.sign(payload)
-                } catch {}
+                } catch {
+                    return req.eventLoop.future(error: error)
+                }
                 
-                return RefreshTokenResponse(accessToken: payloadString, refreshToken: refreshToken)
+                return req.eventLoop.future(user).transform(
+                    to: RefreshTokenResponse(accessToken: payloadString, refreshToken: refreshToken)
+                )
             }
-        
     }
     
 }
@@ -225,10 +228,4 @@ extension AuthController {
         let code: String
     }
     
-}
-
-extension Model {
-    public func save(on req: Request) -> EventLoopFuture<Self> {
-        save(on: req.db).map { self }
-    }
 }
