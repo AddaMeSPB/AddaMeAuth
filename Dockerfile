@@ -4,6 +4,12 @@
 FROM swift:5.2-bionic as build
 WORKDIR /build
 
+RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
+    && apt-get -q update \
+    && apt-get -q dist-upgrade -y \
+    && apt-get install -y libsqlite3-dev nano \
+    && rm -rf /var/lib/apt/lists/*
+
 # First just resolve dependencies.
 # This creates a cached layer that can be reused
 # as long as your Package.swift/Package.resolved
@@ -25,6 +31,9 @@ FROM swift:5.2-bionic-slim
 # Create a vapor user and group with /app as its home directory
 RUN useradd --user-group --create-home --system --skel /dev/null --home-dir /app vapor
 
+ARG env
+ENV env ${env:-production}
+
 # Switch to the new home directory
 WORKDIR /app
 
@@ -33,9 +42,19 @@ COPY --from=build --chown=vapor:vapor /build/.build/release /app
 # Uncomment the next line if you need to load resources from the `Public` directory
 #COPY --from=build --chown=vapor:vapor /build/Public /app/Public
 
+# Copy dotenv files
+COPY --from=build --chown=vapor:vapor /build/.env /app/.env
+COPY --from=build --chown=vapor:vapor /build/.env.production /app/.env.production
+COPY --from=build --chown=vapor:vapor /build/.env.development /app/.env.development
+COPY --from=build --chown=vapor:vapor /build/.env.test /app/.env.test
+# Uncomment the next line if you need to load resources from the `Public` directory
+#COPY --from=build --chown=vapor:vapor /build/Public /app/Public
+# Uncomment the next line if you need to load resources from the `Resources` directory
+#COPY --from=build --chown=vapor:vapor /build/Resources /app/Resources
+
 # Ensure all further commands run as the vapor user
 USER vapor:vapor
 
-# Start the Vapor service when the image is run, default to listening on 8080 in production environment 
+# Start the Vapor service when the image is run, default to listening on 8080 in production environment
 ENTRYPOINT ["./Run"]
-CMD ["serve", "--env", "production", "--hostname", "0.0.0.0", "--port", "8080"]
+CMD ["serve", "--env", "production", "--hostname", "0.0.0.0", "--port", "9090"]

@@ -79,3 +79,4 @@ Dependencies/
 iOSInjectionProject/
 *.p8
 .env
+docker-compose.production.yml
