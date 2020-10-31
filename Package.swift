@@ -8,11 +8,11 @@ let package = Package(
     ],
     dependencies: [
         // 💧 A server-side Swift web framework.
-        .package(url: "https://github.com/vapor/vapor.git", from: "4.27.1"),
-        .package(url: "https://github.com/AddaMeSPB/AddaAPIGatewayModels.git", from: "1.0.5"),
+        .package(url: "https://github.com/vapor/vapor.git", from: "4.34.0"),
+        .package(url: "https://github.com/AddaMeSPB/AddaAPIGatewayModels.git", from: "1.0.16"),
         .package(url: "https://github.com/twof/VaporTwilioService.git", from: "4.0.0"),
-        .package(url: "https://github.com/vapor/jwt.git", from: "4.0.0-rc.2.1"),
-        .package(url: "https://github.com/vapor/apns.git", from: "1.0.0-rc.1.1")
+        .package(url: "https://github.com/vapor/jwt.git", from: "4.0.0"),
+        .package(url: "https://github.com/vapor/apns.git", from: "1.0.0")
     ],
     targets: [
         .target(

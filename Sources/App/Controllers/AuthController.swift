@@ -153,7 +153,7 @@ final class AuthController {
                     return req.eventLoop.future(existingUser)
                 }
                 
-                let user = User.init(phoneNumber)
+                let user = User.init(phoneNumber: phoneNumber)
                 return user.save(on: req.db).map { user }
             }
             .flatMap { user -> EventLoopFuture<LoginResponse> in
