@@ -1,2 +1,3 @@
 .build/
 .swiftpm/
+docker-compose.production.yml
