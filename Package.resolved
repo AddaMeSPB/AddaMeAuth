@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/AddaMeSPB/AddaAPIGatewayModels.git",
         "state": {
           "branch": null,
-          "revision": "bc5951089c61dcf35dc0523957a3979fa5ddeb6c",
-          "version": "1.0.17"
+          "revision": "b4f004debc9f3b9b290b4cc8f7a3dd5a6cf2ad8f",
+          "version": "1.0.18"
         }
       },
       {
@@ -78,8 +78,8 @@
         "repositoryURL": "https://github.com/vapor/fluent-kit.git",
         "state": {
           "branch": null,
-          "revision": "f0cc72ab101b88dfbdbe0b042da62386e1aa8195",
-          "version": "1.8.0"
+          "revision": "31d96b547cc1f869f2885d932a8a9a7ae2103fc6",
+          "version": "1.10.0"
         }
       },
       {
@@ -87,8 +87,8 @@
         "repositoryURL": "https://github.com/vapor/fluent-mongo-driver.git",
         "state": {
           "branch": null,
-          "revision": "4f3c1c3d878f58b15d58887e8cbd9c017104024d",
-          "version": "1.0.1"
+          "revision": "ce519013f51439773fe668d6575888665b0e2dda",
+          "version": "1.0.2"
         }
       },
       {
@@ -231,8 +231,8 @@
         "repositoryURL": "https://github.com/vapor/vapor.git",
         "state": {
           "branch": null,
-          "revision": "be07ff46f2730f730e03522696900966d75b4c2e",
-          "version": "4.34.0"
+          "revision": "b040f90b80ac5906fcf1476a46d360c159f01892",
+          "version": "4.35.0"
         }
       },
       {
