@@ -17,36 +17,57 @@ extension ContactController: RouteCollection {
 }
 
 class ContactController {
-  func create(_ req: Request) throws -> EventLoopFuture<[Contact]> {
+  
+  func create(_ req: Request) throws -> EventLoopFuture<[Contact.ReqRes]> {
     if req.loggedIn == false { throw Abort(.unauthorized) }
     
-    let inputData = try req.content.decode([CreateContact].self)
+    let inputData = try req.content.decode([Contact.ReqRes].self)
     
-    let results =  inputData.map { ccontact -> EventLoopFuture<Contact> in
+    return Contact.query(on: req.db).filter(\.$user.$id == req.payload.userId).all().flatMap { contactsRes in
+      let contacts = contactsRes.map { $0.response }
       
-      return User.query(on: req.db)
-        .filter(\.$phoneNumber == ccontact.phoneNumber)
-        .all()
-        .flatMap { users -> EventLoopFuture<Contact> in
-          
-          let user = users.first == nil ? User(phoneNumber: "") : users.first!
-
-          let contact = Contact(
-            phoneNumber: ccontact.phoneNumber,
-            identifier: ccontact.identifier ?? "" ,
-            fullName: ccontact.fullName,
-            avatar: user.avatar,
-            isRegister: user.phoneNumber == ccontact.phoneNumber,
-            userId: ccontact.userId
-          )
-          
-          return contact.save(on: req.db).transform(to: contact) //.map { _ in contact }
-          
-        }
+      let setOriginal = Set(inputData)
+      let setServerContacts = Set(contacts)
+      let uniqServer = setOriginal.subtracting(setServerContacts)
+      let uniqOrg = setServerContacts.subtracting(setOriginal)
+      
+      if uniqServer.isEmpty && uniqOrg.isEmpty {
+        return Contact.query(on: req.db)
+          .filter(\.$user.$id == req.payload.userId)
+          .filter(\.$isRegister == true)
+          .all()
+          .map { return $0.map { return $0.response } }
+      }
+      
+      let newContacts = uniqServer.isEmpty ? uniqOrg : uniqServer
+      
+      let results = newContacts.compactMap { (contact: Contact.ReqRes) -> EventLoopFuture<Contact.ReqRes> in
+        
+        return User.query(on: req.db)
+          .filter(\.$phoneNumber == contact.phoneNumber)
+          .all()
+          .flatMap { users -> EventLoopFuture<Contact.ReqRes> in
+            
+            let user = users.first == nil ? User(phoneNumber: "") : users.first!
+            
+            let contact = Contact(
+              phoneNumber: contact.phoneNumber,
+              identifier: contact.identifier ?? "",
+              fullName: contact.fullName,
+              avatar: user.avatar,
+              isRegister: user.phoneNumber == contact.phoneNumber,
+              userId: contact.userId
+            )
+            
+            return contact.save(on: req.db).transform(to: contact.response) //.map { _ in contact }
+            
+          }
+        
+      }
+      
+      return results.flatten(on: req.eventLoop)
+      
     }
-    
-    return results.flatten(on: req.eventLoop)
-    
   }
   
 }
