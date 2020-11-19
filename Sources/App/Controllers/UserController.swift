@@ -8,6 +8,7 @@
 import Vapor
 import MongoKitten
 import AddaAPIGatewayModels
+import Fluent
 
 final class UserController: RouteCollection {
 
@@ -16,7 +17,7 @@ final class UserController: RouteCollection {
         routes.put(":usersId", use: update)
     }
 
-    private func find(_ req: Request) throws -> EventLoopFuture<User> {
+  private func find(_ req: Request) throws -> EventLoopFuture<User.Response> {
         guard let _id = req.parameters.get("\(User.schema)Id"),
               let id = ObjectId(_id) else {
             return req.eventLoop.makeFailedFuture(
@@ -24,13 +25,20 @@ final class UserController: RouteCollection {
             )
         }
 
-        return User.find(id, on: req.db)
-            .unwrap(or: Abort(.notFound))
-            .map { $0 }
+      return User.query(on: req.db)
+        .with(\.$attachments)
+        .filter(\.$id == id)
+        .first()
+        .unwrap(or: Abort(.notFound))
+        .map { return $0.response }
+      
+//        return User.find(id, on: req.db)
+//            .unwrap(or: Abort(.notFound))
+//            .map { $0 }
     }
 
     private func update(_ req: Request) throws -> EventLoopFuture<User> {
-        guard let _id = req.parameters.get("\(User.schema)_id"),
+        guard let _id = req.parameters.get("\(User.schema)Id"),
               let id = ObjectId(_id) else {
             return req.eventLoop.makeFailedFuture(
                 Abort(.notFound, reason: "\(#line) parameters user id is missing")

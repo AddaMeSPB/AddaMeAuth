@@ -19,6 +19,11 @@ func routes(_ app: Application) throws {
     let contacts = api.grouped("contacts")
     let contactsAuth = contacts.grouped(JWTMiddleware())
     try contactsAuth.register(collection: ContactController() )
+    
+    let attachments = api.grouped("attachments")
+    let attachmentsAuth = attachments.grouped(JWTMiddleware())
+    try attachmentsAuth.register(collection: AttachmentController())
+    
   }
   
 }
