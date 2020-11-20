@@ -145,7 +145,10 @@ final class AuthController {
         with phoneNumber: String,
         on req: Request) -> EventLoopFuture<LoginResponse> {
         
+      
+      
         return User.query(on: req.db)
+          .with(\.$attachments)
             .filter(\.$phoneNumber == phoneNumber)
             .first()
             .flatMap { queriedUser -> EventLoopFuture<User> in
@@ -161,7 +164,7 @@ final class AuthController {
                 do {
                     let userPayload = Payload(id: user.id!, phoneNumber: user.phoneNumber)
                     let accessToken = try req.application.jwt.signers.sign(userPayload)
-                    let refreshPayload = RefreshToken(user: user)
+                  let refreshPayload = RefreshToken(user: user.response)
                     let refreshToken = try req.application.jwt.signers.sign(refreshPayload)
                     // let userResponse = user.response
                     //_ = smsVerification.delete(on: req.mongoDB)
@@ -185,8 +188,9 @@ final class AuthController {
         guard let userID = jwtPayload.id else {
             return req.eventLoop.makeFailedFuture(Abort(.notFound, reason: "User id missing from RefreshToken"))
         }
-        
+      
         return User.query(on: req.db)
+          .with(\.$attachments)
             .filter(\.$id == userID)
             .first()
             .unwrap(or: Abort(.notFound, reason: "User not found by id: \(userID) for refresh token"))
@@ -194,7 +198,7 @@ final class AuthController {
                 let payload = Payload(id: user.id!, phoneNumber: user.phoneNumber)
                 var payloadString = ""
                 
-                let refreshPayload = RefreshToken(user: user)
+              let refreshPayload = RefreshToken(user: user.response)
                 var refreshToken = ""
                 
                 do {

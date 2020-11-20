@@ -15,7 +15,7 @@ struct RefreshToken: JWTPayload {
     var iat: Int
     var exp: Int
 
-    init(user: User, expiration: Int = 31536000) { // Expiration 1 year
+  init(user: User.Response, expiration: Int = 31536000) { // Expiration 1 year
         let now = Date().timeIntervalSince1970
         self.id = user.id
         self.iat = Int(now)
