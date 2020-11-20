@@ -153,24 +153,24 @@ final class AuthController {
             .first()
             .flatMap { queriedUser -> EventLoopFuture<User.Response> in
                 if let existingUser = queriedUser {
-                    return req.eventLoop.future(existingUser)
+                  return req.eventLoop.future(existingUser.response)
                 }
                 
                 let user = User.init(phoneNumber: phoneNumber)
                 return user.save(on: req.db).map { user.response }
             }
-            .flatMap { user -> EventLoopFuture<LoginResponse> in
+            .flatMap { userResponse -> EventLoopFuture<LoginResponse> in
                 
                 do {
-                    let userPayload = Payload(id: user.id!, phoneNumber: user.phoneNumber)
+                    let userPayload = Payload(id: userResponse.id!, phoneNumber: userResponse.phoneNumber)
                     let accessToken = try req.application.jwt.signers.sign(userPayload)
-                  let refreshPayload = RefreshToken(user: user.response)
+                  let refreshPayload = RefreshToken(user: userResponse)
                     let refreshToken = try req.application.jwt.signers.sign(refreshPayload)
                     // let userResponse = user.response
                     //_ = smsVerification.delete(on: req.mongoDB)
                     let access = RefreshResponse(accessToken: accessToken, refreshToken: refreshToken)
-                    return req.eventLoop.future(user).transform(
-                        to: LoginResponse(user: user, status: "ok", access: access)
+                    return req.eventLoop.future(userResponse).transform(
+                        to: LoginResponse(user: userResponse, status: "ok", access: access)
                     )
                 }
                 catch {

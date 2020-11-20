@@ -35,7 +35,7 @@ struct RefreshResponse: Content {
 }
 
 struct LoginResponse: Content {
-    let user: User?
+  let user: User.Response?
     let status: String
     let access: RefreshResponse?
 }
