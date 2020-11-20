@@ -148,16 +148,16 @@ final class AuthController {
       
       
         return User.query(on: req.db)
-          .with(\.$attachments)
+            .with(\.$attachments)
             .filter(\.$phoneNumber == phoneNumber)
             .first()
-            .flatMap { queriedUser -> EventLoopFuture<User> in
+            .flatMap { queriedUser -> EventLoopFuture<User.Response> in
                 if let existingUser = queriedUser {
                     return req.eventLoop.future(existingUser)
                 }
                 
                 let user = User.init(phoneNumber: phoneNumber)
-                return user.save(on: req.db).map { user }
+                return user.save(on: req.db).map { user.response }
             }
             .flatMap { user -> EventLoopFuture<LoginResponse> in
                 
