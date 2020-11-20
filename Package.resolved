@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "AddaAPIGatewayModels",
+        "repositoryURL": "https://github.com/AddaMeSPB/AddaAPIGatewayModels.git",
+        "state": {
+          "branch": null,
+          "revision": "947bb92c5b1c5e79c0e68e351031091d3ee4ab39",
+          "version": "1.0.31"
+        }
+      },
+      {
         "package": "apns",
         "repositoryURL": "https://github.com/vapor/apns.git",
         "state": {
