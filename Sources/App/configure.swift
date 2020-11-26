@@ -92,6 +92,8 @@ public func configure(_ app: Application) throws {
         app.http.server.configuration.port = 3030
         app.http.server.configuration.hostname = "0.0.0.0"
     }
+  
+    // app.http.server.configuration.supportVersions = [.two]
 
     try routes(app)
     try boot(app)
