@@ -54,7 +54,7 @@ class ContactController {
               phoneNumber: contact.phoneNumber,
               identifier: contact.identifier ?? "",
               fullName: contact.fullName,
-              avatar: user.avatar,
+              avatar: user.attachments.last?.imageUrlString,
               isRegister: user.phoneNumber == contact.phoneNumber,
               userId: contact.userId
             )
