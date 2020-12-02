@@ -17,12 +17,6 @@ extension Environment {
     static let siwaJWKId = Self.get("SIWA_JWK_ID")!
     static let siwaKey = Self.get("SIWA_KEY")!.base64Decoded()!
 
-//    static let apnsKeyId = Self.get("APNS_KEY_ID")!
-//    static let apnsTeamId = Self.get("APNS_TEAM_ID")!
-//    static let apnsTopic = Self.get("APNS_TOPIC")!
-//    static let apnsKey = Self.get("APNS_KEY")!.base64Decoded()!
-
-
     // HOSTS
-    static let eventHost = Self.get("EVENTS_HOST")
+    static let authHost = Self.get("AUTH_HOST")
 }

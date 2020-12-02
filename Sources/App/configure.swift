@@ -1,7 +1,6 @@
 import Vapor
 import MongoKitten
 import Twilio
-import APNS
 import JWTKit
 import Fluent
 import FluentMongoDriver
@@ -9,37 +8,6 @@ import FluentMongoDriver
 // configures your application
 public func configure(_ app: Application) throws {
     // uncomment to serve files from /Public folder
-
-//    switch app.environment {
-//    case .production:
-//        app.apns.configuration = try .init( authenticationMethod: .jwt(
-//            key: .private(pem: Data(Environment.apnsKey.utf8)),
-//            keyIdentifier: .init(string: Environment.apnsKeyId),
-//            teamIdentifier: Environment.apnsTeamId
-//            ),
-//            topic: Environment.apnsTopic,
-//            environment: .production
-//        )
-//    case .development:
-//        app.apns.configuration = try .init(
-//            authenticationMethod: .jwt(
-//                key: .private(pem: Data(Environment.apnsKey.utf8)),
-//                keyIdentifier: .init(string: Environment.apnsKeyId),
-//                teamIdentifier: Environment.apnsTeamId
-//            ),
-//            topic: Environment.apnsTopic,
-//            environment: .sandbox
-//        )
-//    default:
-//        app.apns.configuration = try .init( authenticationMethod: .jwt(
-//            key: .private(pem: Data(Environment.apnsKey.utf8)),
-//            keyIdentifier: .init(string: Environment.apnsKeyId),
-//            teamIdentifier: Environment.apnsTeamId
-//            ),
-//            topic: Environment.apnsTopic,
-//            environment: .sandbox
-//        )
-//    }
 
     var connectionString: String
     switch app.environment {
