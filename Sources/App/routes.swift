@@ -24,6 +24,9 @@ func routes(_ app: Application) throws {
     let attachmentsAuth = attachments.grouped(JWTMiddleware())
     try attachmentsAuth.register(collection: AttachmentController())
     
+    let device = api.grouped("devices")
+    let devicesAuth = device.grouped(JWTMiddleware())
+    try devicesAuth.register(collection: DeviceController() )
   }
   
 }
