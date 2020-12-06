@@ -1,4 +1,5 @@
 import Vapor
+import Leaf
 
 func routes(_ app: Application) throws {
   app.get { req in
@@ -7,6 +8,14 @@ func routes(_ app: Application) throws {
   
   app.get("hello") { req -> String in
     return "Hello, world!"
+  }
+  
+  app.get("terms") { req -> EventLoopFuture<View> in
+    return req.view.render("terms")
+  }
+  
+  app.get("privacy") { req -> EventLoopFuture<View>in
+    return req.view.render("privacy")
   }
   
   try app.group("v1") { api in

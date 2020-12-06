@@ -11,7 +11,8 @@ let package = Package(
         .package(url: "https://github.com/vapor/vapor.git", from: "4.35.0"),
         .package(url: "https://github.com/AddaMeSPB/AddaAPIGatewayModels.git", from: "1.0.36"),
         .package(url: "https://github.com/twof/VaporTwilioService.git", from: "4.0.0"),
-        .package(url: "https://github.com/vapor/jwt.git", from: "4.0.0")
+        .package(url: "https://github.com/vapor/jwt.git", from: "4.0.0"),
+        .package(url: "https://github.com/vapor/leaf.git", from: "4.0.0")
     ],
     targets: [
         .target(
@@ -20,7 +21,8 @@ let package = Package(
                 .product(name: "Vapor", package: "vapor"),
                 .product(name: "AddaAPIGatewayModels", package: "AddaAPIGatewayModels"),
                 .product(name: "Twilio", package: "VaporTwilioService"),
-                .product(name: "JWT", package: "jwt")
+                .product(name: "JWT", package: "jwt"),
+                .product(name: "Leaf", package: "leaf"),
             ],
             swiftSettings: [
                 // Enable better optimizations when building in Release configuration. Despite the use of
