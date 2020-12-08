@@ -9,7 +9,7 @@ let package = Package(
     dependencies: [
         // 💧 A server-side Swift web framework.
         .package(url: "https://github.com/vapor/vapor.git", from: "4.35.0"),
-        .package(path: "../AddaAPIGatewayModels"),
+        .package(url: "https://github.com/AddaMeSPB/AddaAPIGatewayModels.git", from: "1.0.36"),
         .package(url: "https://github.com/twof/VaporTwilioService.git", from: "4.0.0"),
         .package(url: "https://github.com/vapor/jwt.git", from: "4.0.0")
     ],

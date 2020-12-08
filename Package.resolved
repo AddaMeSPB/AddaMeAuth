@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "AddaAPIGatewayModels",
+        "repositoryURL": "https://github.com/AddaMeSPB/AddaAPIGatewayModels.git",
+        "state": {
+          "branch": null,
+          "revision": "cfad5af3a56bb91926cd8ea96059e00a72cf6188",
+          "version": "1.0.36"
+        }
+      },
+      {
         "package": "async-http-client",
         "repositoryURL": "https://github.com/swift-server/async-http-client.git",
         "state": {
