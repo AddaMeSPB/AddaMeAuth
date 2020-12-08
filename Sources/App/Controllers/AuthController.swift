@@ -145,8 +145,6 @@ final class AuthController {
         with phoneNumber: String,
         on req: Request) -> EventLoopFuture<LoginResponse> {
         
-      
-      
         return User.query(on: req.db)
             .with(\.$attachments)
             .filter(\.$phoneNumber == phoneNumber)
@@ -155,9 +153,17 @@ final class AuthController {
                 if let existingUser = queriedUser {
                   return req.eventLoop.future(existingUser.response)
                 }
-                
-                let user = User.init(phoneNumber: phoneNumber)
-                return user.save(on: req.db).map { user.response }
+
+              _ = User.init(phoneNumber: phoneNumber).save(on: req.db)
+              
+              return User.query(on: req.db)
+                .with(\.$attachments)
+                .filter(\.$phoneNumber == phoneNumber)
+                .first()
+                .unwrap(or: Abort(.notFound))
+                .map {
+                  $0.response
+                }
             }
             .flatMap { userResponse -> EventLoopFuture<LoginResponse> in
                 
@@ -190,7 +196,7 @@ final class AuthController {
         }
       
         return User.query(on: req.db)
-          .with(\.$attachments)
+            .with(\.$attachments)
             .filter(\.$id == userID)
             .first()
             .unwrap(or: Abort(.notFound, reason: "User not found by id: \(userID) for refresh token"))

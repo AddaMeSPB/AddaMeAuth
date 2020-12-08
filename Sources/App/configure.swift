@@ -1,5 +1,4 @@
 import Vapor
-import Leaf
 import MongoKitten
 import Twilio
 import JWTKit
@@ -10,9 +9,6 @@ import FluentMongoDriver
 // configures your application
 public func configure(_ app: Application) throws {
     // uncomment to serve files from /Public folder
-
-    app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
-    app.views.use(.leaf)
 
     var connectionString: String
     switch app.environment {

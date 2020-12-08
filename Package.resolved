@@ -2,15 +2,6 @@
   "object": {
     "pins": [
       {
-        "package": "AddaAPIGatewayModels",
-        "repositoryURL": "https://github.com/AddaMeSPB/AddaAPIGatewayModels.git",
-        "state": {
-          "branch": null,
-          "revision": "cfad5af3a56bb91926cd8ea96059e00a72cf6188",
-          "version": "1.0.36"
-        }
-      },
-      {
         "package": "async-http-client",
         "repositoryURL": "https://github.com/swift-server/async-http-client.git",
         "state": {
@@ -89,24 +80,6 @@
           "branch": null,
           "revision": "6055fe8439769aa3646a3c797d573ce7305849c8",
           "version": "4.2.0"
-        }
-      },
-      {
-        "package": "leaf",
-        "repositoryURL": "https://github.com/vapor/leaf.git",
-        "state": {
-          "branch": null,
-          "revision": "2f02ba91307a03ef919d7c8dd781862f6f633c2a",
-          "version": "4.0.1"
-        }
-      },
-      {
-        "package": "leaf-kit",
-        "repositoryURL": "https://github.com/vapor/leaf-kit.git",
-        "state": {
-          "branch": null,
-          "revision": "0f0866e0709c685262dc4b6e726f2d424e37b12c",
-          "version": "1.0.0"
         }
       },
       {

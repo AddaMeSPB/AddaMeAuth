@@ -14,7 +14,7 @@ final class UserController: RouteCollection {
 
     func boot(routes: RoutesBuilder) throws {
         routes.get(":usersId", use: find)
-        routes.put(":usersId", use: update)
+        routes.put(use: update)
     }
 
   private func find(_ req: Request) throws -> EventLoopFuture<User.Response> {
@@ -31,28 +31,18 @@ final class UserController: RouteCollection {
         .first()
         .unwrap(or: Abort(.notFound))
         .map { return $0.response }
-      
-//        return User.find(id, on: req.db)
-//            .unwrap(or: Abort(.notFound))
-//            .map { $0 }
     }
 
-    private func update(_ req: Request) throws -> EventLoopFuture<User> {
-        guard let _id = req.parameters.get("\(User.schema)Id"),
-              let id = ObjectId(_id) else {
-            return req.eventLoop.makeFailedFuture(
-                Abort(.notFound, reason: "\(#line) parameters user id is missing")
-            )
-        }
-
-        let data = try req.content.decode(User.self)
+  private func update(_ req: Request) throws -> EventLoopFuture<User.Response> {
+      
+      let data = try req.content.decode(User.Response.self)
 
         let encoder = BSONEncoder()
         let encoded: Document = try encoder.encode(data)
         let updator: Document = ["$set": encoded]
 
         return req.mongoDB[User.schema]
-            .updateOne(where: "_id" == id, to: updator)
+          .updateOne(where: "_id" == data.id!, to: updator)
             .map { _ in return data }
     }
 
